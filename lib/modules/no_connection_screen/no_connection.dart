@@ -25,7 +25,8 @@ class NoConnectionScreen extends StatelessWidget {
                 if (result == true) {
                   Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => MainScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const MainScreen()),
                       (route) => false);
                 }
               },
