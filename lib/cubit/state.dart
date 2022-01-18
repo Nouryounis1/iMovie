@@ -1,0 +1,13 @@
+abstract class MoviesStates {}
+
+class MoviesInitalState extends MoviesStates {}
+
+class MoviesChangeBottomNavState extends MoviesStates {}
+
+class MoviesChangeCarsouelIndexState extends MoviesStates {}
+
+class MoviesLoadingPopularMoviesDataState extends MoviesStates {}
+
+class MoviesSuccessPopularMoviesDataState extends MoviesStates {}
+
+class MoviesErorPopularMoviesDataState extends MoviesStates {}
