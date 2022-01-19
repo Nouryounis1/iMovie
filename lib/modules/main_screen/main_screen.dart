@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:movies_app/cubit/cubit.dart';
 import 'package:movies_app/cubit/state.dart';
+import 'package:movies_app/styles/colors.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -88,59 +89,63 @@ class MainScreen extends StatelessWidget {
                               enableInfiniteScroll: true,
                               reverse: false,
                               autoPlay: true,
-                              autoPlayInterval: const Duration(seconds: 3),
+                              autoPlayInterval: const Duration(seconds: 2),
                               autoPlayAnimationDuration:
-                                  const Duration(milliseconds: 800),
+                                  const Duration(milliseconds: 2000),
                               autoPlayCurve: Curves.fastOutSlowIn,
                               enlargeCenterPage: true,
                               scrollDirection: Axis.horizontal,
                             ))),
                   ]),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 22.0),
-                        child: Text(
-                          'Trending',
-                          style: GoogleFonts.lato(
-                            textStyle: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 32.0,
-                                fontWeight: FontWeight.w400),
+                  const SizedBox(
+                    height: 15.0,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Trending",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 25,
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20.0, top: 6.0),
-                        child: Text(
-                          'See All',
-                          style: GoogleFonts.lato(
-                            textStyle: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w400),
+                        InkWell(
+                          onTap: () {
+                            // NOTE: do something
+                          },
+                          child: const Text(
+                            "See more",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(
                     height: 28.0,
                   ),
-                  Container(
+                  SizedBox(
                     height: 500.0,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
-                      physics: BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       itemCount: 7,
                       separatorBuilder: (BuildContext context, int index) =>
-                          SizedBox(width: 10.0),
+                          const SizedBox(width: 10.0),
                       itemBuilder: (BuildContext context, int index) {
-                        return trendingItem(
+                        return popularMoviesItem(
                             cubit.popularMovies[index]['original_title'],
-                            cubit.popularMovies[index]['poster_path']);
+                            cubit.popularMovies[index]['poster_path'],
+                            cubit.popularMovies[index]['vote_average']);
                       },
                     ),
                   ),
@@ -173,62 +178,45 @@ class MainScreen extends StatelessWidget {
   }
 }
 
-Widget trendingItem(String name, String path) => Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 25.0),
-          child: Container(
-              height: 270.0,
-              width: 180.0,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image:
-                      NetworkImage('https://image.tmdb.org/t/p/w500/${path}'),
-                  fit: BoxFit.fill,
-                ),
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-
-                    spreadRadius: 1,
-
-                    blurRadius: 1,
-
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-              )),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 25.0, top: 15.0),
-          child: Text(
-            name,
-            style: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w400),
+Widget popularMoviesItem(String title, String path, double rating) => SizedBox(
+      height: 306,
+      width: 200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.network(
+              'https://image.tmdb.org/t/p/w500/$path',
+              width: 190,
+              height: 250,
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 25.0, top: 10.0),
-          child: stars,
-        ),
-      ],
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: Row(
+              children: [1, 2, 3, 4, 5].map((e) {
+                return Icon(
+                  Icons.star,
+                  color: (e <= rating / 2) ? orangeColor : whiteColor,
+                  size: 18,
+                );
+              }).toList(),
+            ),
+          )
+        ],
+      ),
     );
-
-Widget stars = Row(
-  mainAxisSize: MainAxisSize.min,
-  children: [
-    Icon(Icons.star, color: Colors.yellow[600]),
-    Icon(Icons.star, color: Colors.yellow[600]),
-    Icon(Icons.star_border, color: Colors.yellow[600]),
-    Icon(Icons.star_border, color: Colors.yellow[600]),
-    Icon(Icons.star_border, color: Colors.yellow[600]),
-  ],
-);
