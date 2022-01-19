@@ -18,6 +18,7 @@ class MoviesCubit extends Cubit<MoviesStates> {
   int currentIndexCarsouel = 0;
   Movies? moviesModel;
   List<dynamic> popularMovies = [];
+  bool isLoading = true;
 
   String img_path = '';
 

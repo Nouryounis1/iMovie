@@ -43,6 +43,8 @@ dependencies:
   bloc: ^7.1.0
   flutter_bloc: ^7.1.0
   dio: ^4.0.0
+  shimmer:
+
 
 
 
