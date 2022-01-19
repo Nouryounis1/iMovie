@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:movies_app/cubit/cubit.dart';
 import 'package:movies_app/cubit/state.dart';
+import 'package:movies_app/modules/movie_details_screen/movie_details_screen.dart';
+import 'package:movies_app/shared/components/components.dart';
 import 'package:movies_app/shared/components/skeleton.dart';
 import 'package:movies_app/styles/colors.dart';
 
@@ -157,10 +159,22 @@ class MainScreen extends StatelessWidget {
                   itemBuilder: (BuildContext context, int index) {
                     return cubit.isLoading
                         ? popularMoviesLoadingItem()
-                        : popularMoviesItem(
-                            cubit.popularMovies[index]['original_title'],
-                            cubit.popularMovies[index]['poster_path'],
-                            cubit.popularMovies[index]['vote_average']);
+                        : InkWell(
+                            onTap: () {
+                              navigateTo(
+                                  context,
+                                  MovieDetailsScreen(
+                                    imgPath:
+                                        'https://image.tmdb.org/t/p/w500/${cubit.popularMovies[index]['poster_path']}',
+                                    moiveTitle: cubit.popularMovies[index]
+                                        ['original_title'],
+                                  ));
+                            },
+                            child: popularMoviesItem(
+                                cubit.popularMovies[index]['original_title'],
+                                cubit.popularMovies[index]['poster_path'],
+                                cubit.popularMovies[index]['vote_average']),
+                          );
                   },
                 ),
               ),
