@@ -168,6 +168,7 @@ class MainScreen extends StatelessWidget {
                                         'https://image.tmdb.org/t/p/w500/${cubit.popularMovies[index]['poster_path']}',
                                     moiveTitle: cubit.popularMovies[index]
                                         ['original_title'],
+                                    movieId: cubit.popularMovies[index]['id'],
                                   ));
                             },
                             child: popularMoviesItem(

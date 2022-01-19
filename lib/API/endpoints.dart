@@ -10,6 +10,10 @@ class Endpoints {
         '=$page';
   }
 
+  static String getMovieVideo(int movieId) {
+    return "$API_BASE_URL/movie/$movieId/videos?api_key=$API_KEY&language=en-US";
+  }
+
   static String nowPlayingMoviesUrl(int page) {
     return '$API_BASE_URL'
         '/movie/now_playing?api_key='

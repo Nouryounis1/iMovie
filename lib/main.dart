@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => MoviesCubit()..getPlaces())
+        BlocProvider(create: (context) => MoviesCubit()..getPopularMovies())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

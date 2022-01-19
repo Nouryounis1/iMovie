@@ -9,18 +9,22 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 class MovieDetailsScreen extends StatelessWidget {
   final String imgPath;
   final String moiveTitle;
+  final int movieId;
   const MovieDetailsScreen(
-      {Key? key, required this.imgPath, required this.moiveTitle})
+      {Key? key,
+      required this.imgPath,
+      required this.moiveTitle,
+      required this.movieId})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<MoviesCubit, MoviesStates>(
-        listener: (context, state) {},
+    return BlocBuilder<MoviesCubit, MoviesStates>(
+        bloc: BlocProvider.of<MoviesCubit>(context)..getMoviesVideo(movieId),
         builder: (context, state) {
           YoutubePlayerController controller = YoutubePlayerController(
-              initialVideoId: 'kWznlJ-hG_g',
-              flags: YoutubePlayerFlags(autoPlay: true, mute: false));
+              initialVideoId: MoviesCubit.get(context).moviesVideos[0]['key'],
+              flags: const YoutubePlayerFlags(autoPlay: true, mute: false));
           return Scaffold(
             backgroundColor: HexColor('15141F'),
             body: SingleChildScrollView(
@@ -60,7 +64,7 @@ class MovieDetailsScreen extends StatelessWidget {
                             color: Colors.white.withOpacity(0.2),
                           ),
                           alignment: Alignment.center,
-                          child: Icon(
+                          child: const Icon(
                             Icons.play_arrow_rounded,
                             size: 80.0,
                             color: Colors.redAccent,
@@ -72,7 +76,7 @@ class MovieDetailsScreen extends StatelessWidget {
                       height: 35.0,
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Text(
                         moiveTitle,
                         style: const TextStyle(
@@ -93,6 +97,7 @@ showAlertDialog(BuildContext context, controller) {
   // Create AlertDialog
   AlertDialog alert = AlertDialog(
     elevation: 0,
+    actionsPadding: EdgeInsets.zero,
     backgroundColor: Colors.transparent,
     content: YoutubePlayer(
         controller: controller,
