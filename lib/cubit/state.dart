@@ -11,3 +11,5 @@ class MoviesLoadingPopularMoviesDataState extends MoviesStates {}
 class MoviesSuccessPopularMoviesDataState extends MoviesStates {}
 
 class MoviesErorPopularMoviesDataState extends MoviesStates {}
+
+class MoviesCheckVideoUrlState extends MoviesStates {}

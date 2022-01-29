@@ -169,6 +169,9 @@ class MainScreen extends StatelessWidget {
                                     moiveTitle: cubit.popularMovies[index]
                                         ['original_title'],
                                     movieId: cubit.popularMovies[index]['id'],
+                                    data: MoviesCubit.get(context)
+                                      ..getMoviesVideo(
+                                          cubit.popularMovies[index]['id']),
                                   ));
                             },
                             child: popularMoviesItem(

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +13,7 @@ import 'package:movies_app/modules/discover_screen/discover_screen.dart';
 import 'package:movies_app/modules/main_screen/main_screen.dart';
 import 'package:movies_app/modules/search_screen/search_screen.dart';
 import 'package:movies_app/shared/logs.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class MoviesCubit extends Cubit<MoviesStates> {
   MoviesCubit() : super(MoviesInitalState());
@@ -21,6 +24,12 @@ class MoviesCubit extends Cubit<MoviesStates> {
   List<dynamic> popularMovies = [];
   List<dynamic> moviesVideos = [];
   bool isLoading = true;
+  bool isVideoLoading = true;
+  String videoUrl = ''; // This for your video id's
+  final List controllers = []; // This for your video id's
+  static List<YoutubePlayerController>?
+      controllersYoutube; // this is your YouTube Controller data
+  var videoData; // This for store API response
 
   String img_path = '';
 
@@ -40,6 +49,12 @@ class MoviesCubit extends Cubit<MoviesStates> {
     emit(MoviesChangeBottomNavState());
   }
 
+  String changeUrl() {
+    videoUrl = moviesVideos[0]['key'];
+    emit(MoviesCheckVideoUrlState());
+    return videoUrl;
+  }
+
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: API_BASE_URL,
@@ -55,7 +70,8 @@ class MoviesCubit extends Cubit<MoviesStates> {
       Response userData = await _dio.get(Endpoints.getMovieVideo(movieId));
 
       moviesVideos = userData.data['results'];
-      print(moviesVideos[0]['key'] + 'eeeeeeeeee');
+
+      print(videoUrl);
     } on DioError catch (e) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx and is also not 304.
@@ -81,6 +97,7 @@ class MoviesCubit extends Cubit<MoviesStates> {
       Response userData = await _dio.get(Endpoints.popularMoviesUrl(1));
 
       popularMovies = userData.data['results'];
+
       print(popularMovies[0]['original_title'] + 'eeeeeeeeee');
     } on DioError catch (e) {
       // The request was made and the server responded with a status code
