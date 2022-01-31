@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -11,11 +14,17 @@ class MovieDetailsScreen extends StatefulWidget {
   final String moiveTitle;
   final int movieId;
   final dynamic data;
+  final double voteStar;
+  final String relaseDate;
+  final List<dynamic> genres;
   const MovieDetailsScreen(
       {Key? key,
       required this.imgPath,
       required this.moiveTitle,
       required this.movieId,
+      required this.voteStar,
+      required this.relaseDate,
+      required this.genres,
       required this.data})
       : super(key: key);
 
@@ -24,6 +33,7 @@ class MovieDetailsScreen extends StatefulWidget {
 }
 
 String? url;
+List<String> genresName = [];
 
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   @override
@@ -36,6 +46,15 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         });
       }
     });
+
+    for (var i = 0; i <= MoviesCubit.get(context).genres.length - 1; i++)
+      // ignore: curly_braces_in_flow_control_structures
+      for (var j = 0; j <= widget.genres.length - 1; j++) {
+        if (MoviesCubit.get(context).genres[i]['id'] == widget.genres[j]) {
+          genresName.add(MoviesCubit.get(context).genres[i]['name']);
+        }
+      }
+    print(genresName);
   }
 
   @override
@@ -88,24 +107,150 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         child: const Icon(
                           Icons.play_arrow_rounded,
                           size: 80.0,
-                          color: Colors.redAccent,
+                          color: Color.fromRGBO(229, 9, 20, 1),
                         ),
                       ),
-                    )
+                    ),
+                    Positioned(
+                        top: 70.0,
+                        left: 10.0,
+                        child: IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              genresName = [];
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back_ios,
+                              size: 35.0,
+                              color: Colors.white,
+                            )))
                   ]),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      direction: Axis.horizontal,
+                      children: [
+                        Text(
+                          widget.moiveTitle,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 35,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: HexColor(primaryColor),
+                            ),
+                            Text(
+                              '${widget.voteStar} (IMDB)',
+                              style: const TextStyle(
+                                  color: Colors.white, letterSpacing: 2),
+                            ),
+                            const SizedBox(
+                              width: 5.0,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(
-                    height: 35.0,
+                    height: 10.0,
+                  ),
+                  const SizedBox(
+                    height: 10.0,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        children: [
+                          const SizedBox(
+                            height: 10.0,
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(left: 15.0),
+                            child: const Text(
+                              'Release Date',
+                              style: TextStyle(
+                                color: Colors.white,
+                                letterSpacing: 1,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 12.0,
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(left: 5.0),
+                            child: Text(
+                              widget.relaseDate,
+                              style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 3.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: Text(
-                      widget.moiveTitle,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 35,
-                      ),
+                    padding: const EdgeInsets.only(
+                        top: 20.0, left: 20.0, right: 20.0),
+                    child: Container(
+                      width: double.infinity,
+                      height: 0.5,
+                      color: Colors.white30,
                     ),
+                  ),
+                  Row(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 20.0,
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(left: 15.0),
+                            child: const Text(
+                              'Genre',
+                              style: TextStyle(
+                                color: Colors.white,
+                                letterSpacing: 1,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 12.0,
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 15.0),
+                            width: 350.0,
+                            child: Wrap(
+                              spacing: 10.0,
+                              children: [
+                                for (var i in genresName)
+                                  Chip(label: Text(i.toString())),
+                                SizedBox(
+                                  width: 10.0,
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               )),

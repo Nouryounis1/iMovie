@@ -41,7 +41,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => MoviesCubit()..getPopularMovies())
+        BlocProvider(
+            create: (context) => MoviesCubit()
+              ..getPopularMovies()
+              ..getGenres())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -51,7 +54,7 @@ class MyApp extends StatelessWidget {
             child: Lottie.asset('assets/92678-movie.json'),
           ),
           splashIconSize: double.infinity,
-          backgroundColor: HexColor('030002'),
+          backgroundColor: HexColor('15141F'),
           nextScreen: startWidget!,
           duration: 2000,
         ),

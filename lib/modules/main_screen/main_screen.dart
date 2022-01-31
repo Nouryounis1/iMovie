@@ -8,6 +8,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:movies_app/cubit/cubit.dart';
 import 'package:movies_app/cubit/state.dart';
 import 'package:movies_app/modules/movie_details_screen/movie_details_screen.dart';
+import 'package:movies_app/modules/trending_movies/tending_movies_screen.dart';
 import 'package:movies_app/shared/components/components.dart';
 import 'package:movies_app/shared/components/skeleton.dart';
 import 'package:movies_app/styles/colors.dart';
@@ -132,12 +133,17 @@ class MainScreen extends StatelessWidget {
                       onTap: () {
                         // NOTE: do something
                       },
-                      child: const Text(
-                        "See more",
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300,
+                      child: InkWell(
+                        onTap: () {
+                          navigateTo(context, TrendingMoviesScreen());
+                        },
+                        child: const Text(
+                          "See more",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          ),
                         ),
                       ),
                     ),
@@ -172,6 +178,12 @@ class MainScreen extends StatelessWidget {
                                     data: MoviesCubit.get(context)
                                       ..getMoviesVideo(
                                           cubit.popularMovies[index]['id']),
+                                    voteStar: cubit.popularMovies[index]
+                                        ['vote_average'],
+                                    relaseDate: cubit.popularMovies[index]
+                                        ['release_date'],
+                                    genres: cubit.popularMovies[index]
+                                        ['genre_ids'],
                                   ));
                             },
                             child: popularMoviesItem(
@@ -229,39 +241,6 @@ Widget popularMoviesItem(String title, String path, double rating) => SizedBox(
               }).toList(),
             ),
           )
-        ],
-      ),
-    );
-
-Widget popularMoviesLoadingItem() => SizedBox(
-      height: 306,
-      width: 200,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Padding(
-            padding: EdgeInsets.only(left: 10.0),
-            child: Skeleton(
-              width: 190,
-              height: 250,
-              radius: 20.0,
-            ),
-          ),
-          SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.only(left: 10.0),
-            child: Skeleton(
-              width: 190,
-              height: 10,
-            ),
-          ),
-          SizedBox(height: 7),
-          Padding(
-              padding: EdgeInsets.only(left: 10.0),
-              child: Skeleton(
-                width: 100,
-                height: 10,
-              ))
         ],
       ),
     );
