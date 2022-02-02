@@ -6,7 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:movies_app/cubit/cubit.dart';
 import 'package:movies_app/cubit/state.dart';
+import 'package:movies_app/modules/credit_movies_screen/credit_movie_screen.dart';
+import 'package:movies_app/shared/components/components.dart';
 import 'package:movies_app/styles/colors.dart';
+import 'package:readmore/readmore.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class MovieDetailsScreen extends StatefulWidget {
@@ -16,6 +19,7 @@ class MovieDetailsScreen extends StatefulWidget {
   final dynamic data;
   final double voteStar;
   final String relaseDate;
+  final String overview;
   final List<dynamic> genres;
   const MovieDetailsScreen(
       {Key? key,
@@ -25,6 +29,7 @@ class MovieDetailsScreen extends StatefulWidget {
       required this.voteStar,
       required this.relaseDate,
       required this.genres,
+      required this.overview,
       required this.data})
       : super(key: key);
 
@@ -34,6 +39,7 @@ class MovieDetailsScreen extends StatefulWidget {
 
 String? url;
 List<String> genresName = [];
+List<dynamic> casting = [];
 
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   @override
@@ -54,7 +60,24 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
           genresName.add(MoviesCubit.get(context).genres[i]['name']);
         }
       }
-    print(genresName);
+
+    MoviesCubit.get(context).getCredits(widget.movieId).then((value) {
+      if (mounted) {
+        setState(() {
+          casting = MoviesCubit.get(context).crediits;
+        });
+      }
+
+      if (casting.isEmpty) {
+        setState(() {
+          MoviesCubit.get(context).isLoadingCredit = true;
+        });
+      } else {
+        setState(() {
+          MoviesCubit.get(context).isLoadingCredit = false;
+        });
+      }
+    });
   }
 
   @override
@@ -118,6 +141,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                             onPressed: () {
                               Navigator.pop(context);
                               genresName = [];
+                              casting = [];
                             },
                             icon: const Icon(
                               Icons.arrow_back_ios,
@@ -139,27 +163,27 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                             fontSize: 35,
                           ),
                         ),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.star,
-                              color: HexColor(primaryColor),
-                            ),
-                            Text(
-                              '${widget.voteStar} (IMDB)',
-                              style: const TextStyle(
-                                  color: Colors.white, letterSpacing: 2),
-                            ),
-                            const SizedBox(
-                              width: 5.0,
-                            ),
-                          ],
+                        Container(
+                          margin: const EdgeInsets.only(top: 10.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.star,
+                                color: HexColor(primaryColor),
+                              ),
+                              Text(
+                                '${widget.voteStar} (IMDB)',
+                                style: const TextStyle(
+                                    color: Colors.white, letterSpacing: 2),
+                              ),
+                              const SizedBox(
+                                width: 5.0,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(
-                    height: 10.0,
                   ),
                   const SizedBox(
                     height: 10.0,
@@ -171,7 +195,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       Column(
                         children: [
                           const SizedBox(
-                            height: 10.0,
+                            height: 5.0,
                           ),
                           Container(
                             margin: const EdgeInsets.only(left: 15.0),
@@ -235,14 +259,14 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                             height: 12.0,
                           ),
                           Container(
-                            padding: EdgeInsets.only(left: 15.0),
+                            padding: const EdgeInsets.only(left: 15.0),
                             width: 350.0,
                             child: Wrap(
                               spacing: 10.0,
                               children: [
                                 for (var i in genresName)
                                   Chip(label: Text(i.toString())),
-                                SizedBox(
+                                const SizedBox(
                                   width: 10.0,
                                 )
                               ],
@@ -251,6 +275,79 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         ],
                       ),
                     ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 20.0, left: 20.0, right: 20.0),
+                    child: Container(
+                      width: double.infinity,
+                      height: 0.5,
+                      color: Colors.white30,
+                    ),
+                  ),
+                  const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
+                    child: Text(
+                      'Synopsis',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 10.0),
+                    child: ReadMoreText(
+                      widget.overview,
+                      trimLines: 3,
+                      style: const TextStyle(height: 1.5, color: Colors.white),
+                      colorClickableText: const Color.fromRGBO(229, 9, 20, 1),
+                      trimMode: TrimMode.Line,
+                      trimCollapsedText: '...Show more',
+                      trimExpandedText: ' show less',
+                    ),
+                  ),
+                  const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
+                    child: Text(
+                      'Cast',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 350.0,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: 5,
+                      separatorBuilder: (BuildContext context, int index) =>
+                          const SizedBox(width: 10.0),
+                      itemBuilder: (BuildContext context, int index) {
+                        return casting.isEmpty
+                            ? creditLoadingItem()
+                            : InkWell(
+                                onTap: () {
+                                  navigateTo(
+                                      context,
+                                      CreditMoviesScreen(
+                                          creditId: casting[index]['id']));
+                                },
+                                child: creditMovieItem(
+                                  casting[index]['name'],
+                                  casting[index]['profile_path'],
+                                ),
+                              );
+                      },
+                    ),
                   ),
                 ],
               )),

@@ -22,7 +22,13 @@ class Endpoints {
   }
 
   static String getCreditsUrl(int id) {
-    return '$API_BASE_URL' + '/movie/$id/credits?api_key=$API_KEY';
+    return '$API_BASE_URL' '/movie/$id/credits?api_key=$API_KEY';
+  }
+
+  static String getCreditsMovies(int id) {
+    return '$API_BASE_URL'
+        '/person/$id/movie_credits?api_key=$API_KEY'
+        '&language=en-US';
   }
 
   static String topRatedUrl(int page) {

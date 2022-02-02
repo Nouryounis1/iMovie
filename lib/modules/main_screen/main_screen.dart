@@ -184,6 +184,8 @@ class MainScreen extends StatelessWidget {
                                         ['release_date'],
                                     genres: cubit.popularMovies[index]
                                         ['genre_ids'],
+                                    overview: cubit.popularMovies[index]
+                                        ['overview'],
                                   ));
                             },
                             child: popularMoviesItem(

@@ -7,7 +7,9 @@ import 'package:movies_app/API/Endpoints.dart';
 import 'package:movies_app/API/api_constants.dart';
 import 'package:movies_app/API/dio_helper.dart';
 import 'package:movies_app/cubit/state.dart';
+import 'package:movies_app/models/credit_movies_model.dart';
 import 'package:movies_app/models/geners_model.dart';
+import 'package:movies_app/models/movie_credit_model.dart';
 import 'package:movies_app/models/movies_model.dart';
 import 'package:movies_app/models/movies_video_model.dart';
 import 'package:movies_app/modules/discover_screen/discover_screen.dart';
@@ -25,14 +27,14 @@ class MoviesCubit extends Cubit<MoviesStates> {
   List<dynamic> popularMovies = [];
   List<dynamic> moviesVideos = [];
   List<dynamic> genres = [];
+  List<dynamic> crediits = [];
+  List<dynamic> creditMoviess = [];
 
   bool isLoading = true;
   bool isVideoLoading = true;
+  bool isLoadingCredit = true;
+  bool isLoadingCreditMovies = true;
   String videoUrl = ''; // This for your video id's
-  final List controllers = []; // This for your video id's
-  static List<YoutubePlayerController>?
-      controllersYoutube; // this is your YouTube Controller data
-  var videoData; // This for store API response
 
   String img_path = '';
 
@@ -145,5 +147,59 @@ class MoviesCubit extends Cubit<MoviesStates> {
     }
 
     return generess;
+  }
+
+  Future<MovieCredit?> getCredits(int id) async {
+    MovieCredit? credits;
+
+    try {
+      Response userData = await _dio.get(Endpoints.getCreditsUrl(id));
+
+      crediits = userData.data['cast'];
+
+      print(crediits[0]);
+    } on DioError catch (e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      if (e.response != null) {
+        print('Dio error!');
+        print('STATUS: ${e.response?.statusCode}');
+        print('DATA: ${e.response?.data}');
+        print('HEADERS: ${e.response?.headers}');
+      } else {
+        // Error due to setting up or sending the request
+        print('Error sending request!');
+        print(e.message);
+      }
+    }
+
+    return credits;
+  }
+
+  Future<CreditMovies?> getCreditsMovies(int id) async {
+    CreditMovies? creditMovies;
+
+    try {
+      Response userData = await _dio.get(Endpoints.getCreditsMovies(id));
+
+      creditMoviess = userData.data['cast'];
+
+      print(creditMoviess[0]['poster_path']);
+    } on DioError catch (e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      if (e.response != null) {
+        print('Dio error!');
+        print('STATUS: ${e.response?.statusCode}');
+        print('DATA: ${e.response?.data}');
+        print('HEADERS: ${e.response?.headers}');
+      } else {
+        // Error due to setting up or sending the request
+        print('Error sending request!');
+        print(e.message);
+      }
+    }
+
+    return creditMovies;
   }
 }

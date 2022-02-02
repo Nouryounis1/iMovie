@@ -39,3 +39,77 @@ Widget popularMoviesLoadingItem() => SizedBox(
         ],
       ),
     );
+
+Widget creditMoviesLoadingItem() => SizedBox(
+      height: 306,
+      width: 200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Padding(
+            padding: EdgeInsets.only(left: 10.0),
+            child: Skeleton(
+              width: 190,
+              height: 250,
+              radius: 20.0,
+            ),
+          ),
+        ],
+      ),
+    );
+
+Widget creditLoadingItem() => SizedBox(
+      height: 306,
+      width: 200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Padding(
+            padding: EdgeInsets.only(left: 10.0),
+            child: Skeleton(
+              width: 190,
+              height: 250,
+              radius: 20.0,
+            ),
+          ),
+          SizedBox(height: 10),
+          Padding(
+            padding: EdgeInsets.only(left: 10.0),
+            child: Skeleton(
+              width: 190,
+              height: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+
+Widget creditMovieItem(String title, String path) => SizedBox(
+      height: 306,
+      width: 200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.network(
+              'https://image.tmdb.org/t/p/w500/$path',
+              width: 190,
+              height: 250,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.only(left: 15.0),
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
