@@ -9,6 +9,7 @@ import 'package:movies_app/API/dio_helper.dart';
 import 'package:movies_app/cubit/state.dart';
 import 'package:movies_app/models/credit_movies_model.dart';
 import 'package:movies_app/models/geners_model.dart';
+import 'package:movies_app/models/moies_genre_model.dart';
 import 'package:movies_app/models/movie_credit_model.dart';
 import 'package:movies_app/models/movies_model.dart';
 import 'package:movies_app/models/movies_video_model.dart';
@@ -29,11 +30,13 @@ class MoviesCubit extends Cubit<MoviesStates> {
   List<dynamic> genres = [];
   List<dynamic> crediits = [];
   List<dynamic> creditMoviess = [];
+  List<dynamic> genreMoviesss = [];
 
   bool isLoading = true;
   bool isVideoLoading = true;
   bool isLoadingCredit = true;
   bool isLoadingCreditMovies = true;
+  bool isLoadingGenreMovies = true;
   String videoUrl = ''; // This for your video id's
 
   String img_path = '';
@@ -201,5 +204,30 @@ class MoviesCubit extends Cubit<MoviesStates> {
     }
 
     return creditMovies;
+  }
+
+  Future<GenreMovies?> getgenresMovies(int id) async {
+    GenreMovies? genreMovies;
+
+    try {
+      Response userData = await _dio.get(Endpoints.getMoviesForGenre(id, 1));
+
+      genreMoviesss = userData.data['results'];
+    } on DioError catch (e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      if (e.response != null) {
+        print('Dio error!');
+        print('STATUS: ${e.response?.statusCode}');
+        print('DATA: ${e.response?.data}');
+        print('HEADERS: ${e.response?.headers}');
+      } else {
+        // Error due to setting up or sending the request
+        print('Error sending request!');
+        print(e.message);
+      }
+    }
+
+    return genreMovies;
   }
 }

@@ -56,7 +56,7 @@ class _CreditMoviesScreenState extends State<CreditMoviesScreen> {
               ),
               backgroundColor: HexColor('15141F'),
               body: GridView.count(
-                childAspectRatio: 1.45 / 2,
+                childAspectRatio: 1.45 / 2.2,
                 crossAxisCount: 2,
                 children: List.generate(movies.length, (index) {
                   return InkWell(
@@ -97,7 +97,7 @@ Widget popularMoviesItem(String path) => SizedBox(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: path == null
+            child: path == 'null'
                 ? creditLoadingItem()
                 : Image.network(
                     'https://image.tmdb.org/t/p/w500/$path',

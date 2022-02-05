@@ -73,13 +73,6 @@ Widget creditLoadingItem() => SizedBox(
             ),
           ),
           SizedBox(height: 10),
-          Padding(
-            padding: EdgeInsets.only(left: 10.0),
-            child: Skeleton(
-              width: 190,
-              height: 10,
-            ),
-          ),
         ],
       ),
     );

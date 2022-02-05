@@ -6,7 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:movies_app/cubit/cubit.dart';
 import 'package:movies_app/cubit/state.dart';
+import 'package:movies_app/models/moies_genre_model.dart';
 import 'package:movies_app/modules/credit_movies_screen/credit_movie_screen.dart';
+import 'package:movies_app/modules/movies_genre_screen/movies_genre_screen.dart';
 import 'package:movies_app/shared/components/components.dart';
 import 'package:movies_app/styles/colors.dart';
 import 'package:readmore/readmore.dart';
@@ -39,6 +41,10 @@ class MovieDetailsScreen extends StatefulWidget {
 
 String? url;
 List<String> genresName = [];
+List<dynamic> genresId = [];
+
+Map genreMap = Map<int, String>();
+
 List<dynamic> casting = [];
 
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
@@ -57,7 +63,9 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       // ignore: curly_braces_in_flow_control_structures
       for (var j = 0; j <= widget.genres.length - 1; j++) {
         if (MoviesCubit.get(context).genres[i]['id'] == widget.genres[j]) {
-          genresName.add(MoviesCubit.get(context).genres[i]['name']);
+          // genresName.add(MoviesCubit.get(context).genres[i]['name']);
+          genreMap[MoviesCubit.get(context).genres[i]['id']] =
+              MoviesCubit.get(context).genres[i]['name'];
         }
       }
 
@@ -142,6 +150,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               Navigator.pop(context);
                               genresName = [];
                               casting = [];
+                              genreMap = {};
                             },
                             icon: const Icon(
                               Icons.arrow_back_ios,
@@ -264,8 +273,20 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                             child: Wrap(
                               spacing: 10.0,
                               children: [
-                                for (var i in genresName)
-                                  Chip(label: Text(i.toString())),
+                                //     for (var i in genresName)
+
+                                for (var k in genreMap.keys)
+                                  InkWell(
+                                      onTap: () {
+                                        navigateTo(
+                                            context,
+                                            MoviesGenreMovies(
+                                              genreId: k,
+                                            ));
+                                      },
+                                      child:
+                                          Chip(label: Text('${genreMap[k]}'))),
+
                                 const SizedBox(
                                   width: 10.0,
                                 )
@@ -328,7 +349,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
                       physics: const BouncingScrollPhysics(),
-                      itemCount: 5,
+                      itemCount: casting.length < 5 ? 3 : 5,
                       separatorBuilder: (BuildContext context, int index) =>
                           const SizedBox(width: 10.0),
                       itemBuilder: (BuildContext context, int index) {
