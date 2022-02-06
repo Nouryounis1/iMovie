@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:movies_app/shared/components/skeleton.dart';
+import 'package:movies_app/styles/colors.dart';
 
 void navigateTo(context, widget) =>
     Navigator.push(context, MaterialPageRoute(builder: (context) => widget));
@@ -104,5 +106,50 @@ Widget creditMovieItem(String title, String path) => SizedBox(
             ),
           ),
         ],
+      ),
+    );
+
+Widget defaultFormField(
+        {@required TextEditingController? controller,
+        @required TextInputType? type,
+        @required String? label,
+        @required IconData? prefix,
+        IconData? suffix,
+        bool isPassword = false,
+        @required String? validateText,
+        dynamic onSubmmit,
+        Function()? sufixPressed,
+        bool isClicable = true}) =>
+    TextFormField(
+      controller: controller,
+      style: const TextStyle(color: Colors.white),
+      onFieldSubmitted: onSubmmit,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return validateText;
+        }
+        return null;
+      },
+      keyboardType: type,
+      obscureText: isPassword,
+      enabled: isClicable,
+      decoration: InputDecoration(
+        enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white)),
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: HexColor(primaryColor))),
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.white),
+        prefixIcon: Icon(
+          prefix,
+          color: Colors.white,
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            suffix,
+            color: Colors.white,
+          ),
+          onPressed: sufixPressed,
+        ),
       ),
     );

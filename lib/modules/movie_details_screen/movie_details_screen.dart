@@ -273,8 +273,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                             child: Wrap(
                               spacing: 10.0,
                               children: [
-                                //     for (var i in genresName)
-
                                 for (var k in genreMap.keys)
                                   InkWell(
                                       onTap: () {
@@ -286,7 +284,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                                       },
                                       child:
                                           Chip(label: Text('${genreMap[k]}'))),
-
                                 const SizedBox(
                                   width: 10.0,
                                 )

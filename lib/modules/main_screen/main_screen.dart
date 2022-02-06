@@ -8,6 +8,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:movies_app/cubit/cubit.dart';
 import 'package:movies_app/cubit/state.dart';
 import 'package:movies_app/modules/movie_details_screen/movie_details_screen.dart';
+import 'package:movies_app/modules/search_screen/search_screen.dart';
 import 'package:movies_app/modules/trending_movies/tending_movies_screen.dart';
 import 'package:movies_app/shared/components/components.dart';
 import 'package:movies_app/shared/components/skeleton.dart';
@@ -112,6 +113,18 @@ class MainScreen extends StatelessWidget {
                           enlargeCenterPage: true,
                           scrollDirection: Axis.horizontal,
                         ))),
+                Positioned(
+                    top: 60.0,
+                    right: 10.0,
+                    child: IconButton(
+                        onPressed: () {
+                          navigateTo(context, SerachScreen());
+                        },
+                        icon: const Icon(
+                          Icons.search,
+                          size: 35.0,
+                          color: Colors.white,
+                        )))
               ]),
               const SizedBox(
                 height: 15.0,

@@ -6,6 +6,8 @@ class MoviesChangeBottomNavState extends MoviesStates {}
 
 class MoviesChangeCarsouelIndexState extends MoviesStates {}
 
+class SearchBarBalueState extends MoviesStates {}
+
 class MoviesLoadingPopularMoviesDataState extends MoviesStates {}
 
 class MoviesSuccessPopularMoviesDataState extends MoviesStates {}

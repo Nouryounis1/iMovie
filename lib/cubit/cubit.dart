@@ -39,13 +39,20 @@ class MoviesCubit extends Cubit<MoviesStates> {
   bool isLoadingGenreMovies = true;
   String videoUrl = ''; // This for your video id's
 
+  bool searchValue = false;
+
   String img_path = '';
 
   List<Widget> bottomScreens = [
     const MainScreen(),
     const DiscoverScreen(),
-    const SerachScreen()
+    SerachScreen()
   ];
+
+  void changeValueOfSearchBar(bool value) {
+    searchValue = value;
+    emit(SearchBarBalueState());
+  }
 
   void changeIndexOfCarsouel(int index) {
     currentIndexCarsouel = index;
