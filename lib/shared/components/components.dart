@@ -79,6 +79,24 @@ Widget creditLoadingItem() => SizedBox(
       ),
     );
 
+Widget searchImageLoadingItem() => SizedBox(
+      height: 180,
+      width: 130,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Padding(
+            padding: EdgeInsets.only(left: 10.0),
+            child: Skeleton(
+              width: 190,
+              height: 250,
+              radius: 20.0,
+            ),
+          ),
+        ],
+      ),
+    );
+
 Widget creditMovieItem(String title, String path) => SizedBox(
       height: 306,
       width: 200,
