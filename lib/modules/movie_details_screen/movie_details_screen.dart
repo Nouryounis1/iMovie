@@ -346,7 +346,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
                       physics: const BouncingScrollPhysics(),
-                      itemCount: casting.length < 5 ? 3 : 5,
+                      itemCount: casting.length < 5 ? 1 : 5,
                       separatorBuilder: (BuildContext context, int index) =>
                           const SizedBox(width: 10.0),
                       itemBuilder: (BuildContext context, int index) {

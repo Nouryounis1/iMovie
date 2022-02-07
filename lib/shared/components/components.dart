@@ -87,23 +87,27 @@ Widget creditMovieItem(String title, String path) => SizedBox(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Image.network(
-              'https://image.tmdb.org/t/p/w500/$path',
-              width: 190,
-              height: 250,
-            ),
+            child: path == ''
+                ? creditLoadingItem()
+                : Image.network(
+                    'https://image.tmdb.org/t/p/w500/$path',
+                    width: 190,
+                    height: 250,
+                  ),
           ),
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.only(left: 15.0),
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-                fontSize: 20,
-              ),
-            ),
+            child: title == ''
+                ? Text('Name')
+                : Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20,
+                    ),
+                  ),
           ),
         ],
       ),

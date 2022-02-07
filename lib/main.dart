@@ -44,7 +44,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
             create: (context) => MoviesCubit()
               ..getPopularMovies()
-              ..getGenres())
+              ..getGenres()
+              ..getNowPlayingMovies()
+              ..getAllMoviesGenres())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

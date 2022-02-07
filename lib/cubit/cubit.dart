@@ -7,12 +7,14 @@ import 'package:movies_app/API/Endpoints.dart';
 import 'package:movies_app/API/api_constants.dart';
 import 'package:movies_app/API/dio_helper.dart';
 import 'package:movies_app/cubit/state.dart';
+import 'package:movies_app/models/all_movies_genres.dart';
 import 'package:movies_app/models/credit_movies_model.dart';
 import 'package:movies_app/models/geners_model.dart';
 import 'package:movies_app/models/moies_genre_model.dart';
 import 'package:movies_app/models/movie_credit_model.dart';
 import 'package:movies_app/models/movies_model.dart';
 import 'package:movies_app/models/movies_video_model.dart';
+import 'package:movies_app/models/nowplaying_movies_model.dart';
 import 'package:movies_app/modules/discover_screen/discover_screen.dart';
 import 'package:movies_app/modules/main_screen/main_screen.dart';
 import 'package:movies_app/modules/search_screen/search_screen.dart';
@@ -31,7 +33,9 @@ class MoviesCubit extends Cubit<MoviesStates> {
   List<dynamic> crediits = [];
   List<dynamic> creditMoviess = [];
   List<dynamic> genreMoviesss = [];
-
+  List<dynamic> nowPlayingMovies = [];
+  List<dynamic> allMoviesGenress = [];
+  Map<int, String> map1 = {};
   bool isLoading = true;
   bool isVideoLoading = true;
   bool isLoadingCredit = true;
@@ -236,5 +240,60 @@ class MoviesCubit extends Cubit<MoviesStates> {
     }
 
     return genreMovies;
+  }
+
+  Future<NowPlaying?> getNowPlayingMovies() async {
+    NowPlaying? nowPlaying;
+
+    try {
+      Response userData = await _dio.get(Endpoints.nowPlayingMoviesUrl(1));
+
+      nowPlayingMovies = userData.data['results'];
+    } on DioError catch (e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      if (e.response != null) {
+        print('Dio error!');
+        print('STATUS: ${e.response?.statusCode}');
+        print('DATA: ${e.response?.data}');
+        print('HEADERS: ${e.response?.headers}');
+      } else {
+        // Error due to setting up or sending the request
+        print('Error sending request!');
+        print(e.message);
+      }
+    }
+
+    return nowPlaying;
+  }
+
+  Future<AllMoviesGenres?> getAllMoviesGenres() async {
+    AllMoviesGenres? allMoviesGenres;
+
+    try {
+      Response userData = await _dio.get(Endpoints.genresUrl());
+
+      allMoviesGenress = userData.data['genres'];
+
+      for (var i = 0; i <= allMoviesGenress.length - 1; i++) {
+        map1[allMoviesGenress[i]['id']] = allMoviesGenress[i]['name'];
+      }
+      print('${map1[28]} eeeeeeee');
+    } on DioError catch (e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      if (e.response != null) {
+        print('Dio error!');
+        print('STATUS: ${e.response?.statusCode}');
+        print('DATA: ${e.response?.data}');
+        print('HEADERS: ${e.response?.headers}');
+      } else {
+        // Error due to setting up or sending the request
+        print('Error sending request!');
+        print(e.message);
+      }
+    }
+
+    return allMoviesGenres;
   }
 }
