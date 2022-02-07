@@ -25,6 +25,14 @@ class SerachScreen extends StatelessWidget {
             child: Scaffold(
               backgroundColor: HexColor('15141F'),
               appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+
+                    MoviesCubit.get(context).movieSearch = [];
+                  },
+                ),
                 elevation: 0,
                 centerTitle: true,
                 backgroundColor: Colors.transparent,
