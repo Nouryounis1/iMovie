@@ -14,6 +14,7 @@ class SerachScreen extends StatelessWidget {
 
   var formKey = GlobalKey<FormState>();
   var searchContoller = TextEditingController();
+  var searchContoller2 = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -119,11 +120,11 @@ class SerachScreen extends StatelessWidget {
                                                   .getMovieSearch(value);
                                               if (value.isNotEmpty) {
                                                 MoviesCubit.get(context)
-                                                    .changeValueOfSearchBar(
+                                                    .changeValueOfSearchBarMovie(
                                                         true);
                                               } else {
                                                 MoviesCubit.get(context)
-                                                    .changeValueOfSearchBar(
+                                                    .changeValueOfSearchBarMovie(
                                                         false);
                                                 MoviesCubit.get(context)
                                                     .movieSearch = [];
@@ -154,7 +155,7 @@ class SerachScreen extends StatelessWidget {
                                                                   .clear();
                                                               MoviesCubit.get(
                                                                       context)
-                                                                  .changeValueOfSearchBar(
+                                                                  .changeValueOfSearchBarMovie(
                                                                       false);
                                                               MoviesCubit.get(
                                                                       context)
@@ -377,20 +378,38 @@ class SerachScreen extends StatelessWidget {
                                                                   .start,
                                                           children: [
                                                             ClipRRect(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              child:
-                                                                  Image.network(
-                                                                'https://image.tmdb.org/t/p/w500/'
-                                                                '${MoviesCubit.get(context).movieSearch[index]['poster_path']}',
-                                                                width: 130,
-                                                                height: 180,
-                                                                fit:
-                                                                    BoxFit.fill,
-                                                              ),
-                                                            ),
+                                                                borderRadius: BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                                child: MoviesCubit.get(context)
+                                                                                .movieSearch[index]
+                                                                            [
+                                                                            'poster_path'] ==
+                                                                        null
+                                                                    ? const FadeInImage(
+                                                                        width:
+                                                                            130,
+                                                                        height:
+                                                                            180,
+                                                                        fit: BoxFit
+                                                                            .fill,
+                                                                        placeholder:
+                                                                            AssetImage(
+                                                                                'assets/placeholder.jpg'),
+                                                                        image: AssetImage(
+                                                                            'assets/placeholder.jpg'))
+                                                                    : FadeInImage(
+                                                                        width:
+                                                                            130,
+                                                                        height:
+                                                                            180,
+                                                                        fit: BoxFit
+                                                                            .fill,
+                                                                        placeholder:
+                                                                            const AssetImage(
+                                                                                'assets/placeholder.jpg'),
+                                                                        image: NetworkImage(
+                                                                            'https://image.tmdb.org/t/p/w500/${MoviesCubit.get(context).movieSearch[index]['poster_path']}'))),
                                                             const SizedBox(
                                                                 width: 15),
                                                             Column(
@@ -512,7 +531,228 @@ class SerachScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          Text('data')
+                          SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 10.0, vertical: 8.0),
+                                  decoration: const BoxDecoration(
+                                    color: Color.fromARGB(50, 255, 255, 255),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(22.0)),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10.0),
+                                          child: TextFormField(
+                                            cursorColor: HexColor(primaryColor),
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                            onChanged: (String value) {
+                                              MoviesCubit.get(context)
+                                                  .getMovieSearch(value);
+                                              if (value.isNotEmpty) {
+                                                MoviesCubit.get(context)
+                                                    .changeValueOfSearchBarPerson(
+                                                        true);
+                                              } else {
+                                                MoviesCubit.get(context)
+                                                    .changeValueOfSearchBarPerson(
+                                                        false);
+                                                MoviesCubit.get(context)
+                                                    .movieSearch = [];
+                                              }
+                                            },
+                                            controller: searchContoller2,
+                                            decoration: InputDecoration(
+                                                contentPadding:
+                                                    const EdgeInsets.only(
+                                                  top: 14,
+                                                ),
+                                                border: InputBorder.none,
+                                                hintText: 'Person Name',
+                                                hintStyle: TextStyle(
+                                                    color:
+                                                        Colors.grey.shade300),
+                                                suffixIcon:
+                                                    MoviesCubit.get(context)
+                                                            .searchValue
+                                                        ? IconButton(
+                                                            icon: const Icon(
+                                                              Icons.cancel,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                            onPressed: () {
+                                                              searchContoller2
+                                                                  .clear();
+                                                              MoviesCubit.get(
+                                                                      context)
+                                                                  .changeValueOfSearchBarPerson(
+                                                                      false);
+                                                              MoviesCubit.get(
+                                                                      context)
+                                                                  .movieSearch = [];
+                                                            },
+                                                          )
+                                                        : const SizedBox(
+                                                            height: 0,
+                                                            width: 0,
+                                                          ),
+                                                prefixIcon: const Icon(
+                                                  Icons.search,
+                                                  color: Colors.white,
+                                                )),
+                                          ),
+                                        ),
+                                        flex: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 20.0,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20),
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Popular  ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 20.0,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 20.0,
+                                        ),
+                                        ListView.separated(
+                                            scrollDirection: Axis.vertical,
+                                            shrinkWrap: true,
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            itemBuilder: (context, index) {
+                                              return SizedBox(
+                                                width: 180,
+                                                child: Row(
+                                                  children: [
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      child: MoviesCubit.get(
+                                                                          context)
+                                                                      .popularPersons[index]
+                                                                  [
+                                                                  'profile_path'] ==
+                                                              null
+                                                          ? searchImageLoadingItem()
+                                                          : Image.network(
+                                                              'https://image.tmdb.org/t/p/w500/'
+                                                              '${MoviesCubit.get(context).popularPersons[index]['profile_path']}',
+                                                              width: 130,
+                                                              height: 190,
+                                                              fit: BoxFit.fill,
+                                                            ),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 20,
+                                                    ),
+                                                    Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        SizedBox(
+                                                          width: 150.0,
+                                                          child: Text(
+                                                            MoviesCubit.get(
+                                                                        context)
+                                                                    .popularPersons[
+                                                                index]['name'],
+                                                            style:
+                                                                const TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              fontSize: 20,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 10.0,
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            MoviesCubit.get(context)
+                                                                            .popularPersons[index]
+                                                                        [
+                                                                        'popularity'] <
+                                                                    70
+                                                                ? const Icon(
+                                                                    Icons
+                                                                        .trending_down,
+                                                                    color: Colors
+                                                                        .redAccent,
+                                                                  )
+                                                                : const Icon(
+                                                                    Icons
+                                                                        .trending_up,
+                                                                    color: Colors
+                                                                        .greenAccent,
+                                                                  ),
+                                                            SizedBox(
+                                                              width: 10.0,
+                                                            ),
+                                                            Text(
+                                                              '${(MoviesCubit.get(context).popularPersons[index]['popularity'] / 10).toStringAsFixed(2)} %',
+                                                              style: const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize:
+                                                                      12.0,
+                                                                  letterSpacing:
+                                                                      2),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                            separatorBuilder:
+                                                (context, index) =>
+                                                    const SizedBox(
+                                                      height: 20.0,
+                                                    ),
+                                            itemCount: 10)
+                                      ]),
+                                ),
+                              ],
+                            ),
+                          )
                         ]),
                       ),
                     )

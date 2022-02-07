@@ -87,4 +87,8 @@ class Endpoints {
   static getPerson(int personId) {
     return "$API_BASE_URL/person/$personId?api_key=$API_KEY&append_to_response=movie_credits";
   }
+
+  static getPersonPopular() {
+    return "$API_BASE_URL/person/popular?api_key=$API_KEY&language=en-US&page=1";
+  }
 }

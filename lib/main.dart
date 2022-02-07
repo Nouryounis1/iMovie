@@ -46,7 +46,8 @@ class MyApp extends StatelessWidget {
               ..getPopularMovies()
               ..getGenres()
               ..getNowPlayingMovies()
-              ..getAllMoviesGenres())
+              ..getAllMoviesGenres()
+              ..getPopularPersons())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
