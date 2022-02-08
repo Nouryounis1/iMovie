@@ -1,20 +1,37 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:movies_app/cubit/cubit.dart';
 import 'package:movies_app/cubit/state.dart';
-import 'package:movies_app/models/movie_credit_model.dart';
 import 'package:movies_app/shared/components/components.dart';
 import 'package:movies_app/styles/colors.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 // ignore: must_be_immutable
-class SerachScreen extends StatelessWidget {
+class SerachScreen extends StatefulWidget {
   SerachScreen({Key? key}) : super(key: key);
 
+  @override
+  State<SerachScreen> createState() => _SerachScreenState();
+}
+
+SpeechToText? speechToText;
+bool isListening = false;
+String voiceText = '';
+double voiceConfidence = 1.0;
+
+class _SerachScreenState extends State<SerachScreen> {
   var formKey = GlobalKey<FormState>();
+
   var searchContoller = TextEditingController();
+
   var searchContoller2 = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    speechToText = SpeechToText();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +129,7 @@ class SerachScreen extends StatelessWidget {
                                           padding:
                                               const EdgeInsets.only(left: 10.0),
                                           child: TextFormField(
+                                            enableInteractiveSelection: false,
                                             cursorColor: HexColor(primaryColor),
                                             style: const TextStyle(
                                                 color: Colors.white),
@@ -141,7 +159,38 @@ class SerachScreen extends StatelessWidget {
                                                 hintStyle: TextStyle(
                                                     color:
                                                         Colors.grey.shade300),
-                                                suffixIcon:
+                                                suffixIcon: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween, // added line
+                                                  mainAxisSize: MainAxisSize
+                                                      .min, // added line
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTapDown: (_) {
+                                                        searchContoller.clear();
+                                                        listen();
+                                                        setState(() {
+                                                          searchContoller.text =
+                                                              voiceText;
+                                                        });
+                                                      },
+                                                      onTapUp: (_) {
+                                                        print(voiceText);
+                                                      },
+                                                      child:
+                                                          FloatingActionButton(
+                                                        elevation: 0.0,
+                                                        onPressed: () {},
+                                                        mini: true,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        child: Icon(Icons.mic),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 5.0,
+                                                    ),
                                                     MoviesCubit.get(context)
                                                             .searchValue
                                                         ? IconButton(
@@ -166,6 +215,8 @@ class SerachScreen extends StatelessWidget {
                                                             height: 0,
                                                             width: 0,
                                                           ),
+                                                  ],
+                                                ),
                                                 prefixIcon: const Icon(
                                                   Icons.search,
                                                   color: Colors.white,
@@ -762,5 +813,28 @@ class SerachScreen extends StatelessWidget {
             ),
           );
         });
+  }
+
+  void listen() async {
+    if (!isListening) {
+      bool available = await speechToText!.initialize(
+        onStatus: (val) => print('onStatus: $val'),
+        onError: (val) => print('onError: $val'),
+      );
+      if (available) {
+        setState(() => isListening = true);
+        speechToText!.listen(
+          onResult: (val) => setState(() {
+            voiceText = val.recognizedWords;
+            if (val.hasConfidenceRating && val.confidence > 0) {
+              voiceConfidence = val.confidence;
+            }
+          }),
+        );
+      }
+    } else {
+      setState(() => isListening = false);
+      speechToText!.stop();
+    }
   }
 }

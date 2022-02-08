@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_app/API/Endpoints.dart';
 import 'package:movies_app/API/api_constants.dart';
-import 'package:movies_app/API/dio_helper.dart';
 import 'package:movies_app/cubit/state.dart';
 import 'package:movies_app/models/all_movies_genres.dart';
 import 'package:movies_app/models/credit_movies_model.dart';
@@ -21,6 +18,7 @@ import 'package:movies_app/modules/discover_screen/discover_screen.dart';
 import 'package:movies_app/modules/main_screen/main_screen.dart';
 import 'package:movies_app/modules/search_screen/search_screen.dart';
 import 'package:movies_app/shared/logs.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class MoviesCubit extends Cubit<MoviesStates> {
