@@ -162,21 +162,25 @@ class _SerachScreenState extends State<SerachScreen> {
                                                 suffixIcon: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment
-                                                          .spaceBetween, // added line
-                                                  mainAxisSize: MainAxisSize
-                                                      .min, // added line
+                                                          .spaceBetween,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
-                                                    GestureDetector(
-                                                      onTapDown: (_) {
-                                                        searchContoller.clear();
+                                                    Listener(
+                                                      onPointerDown: (_) {
+                                                        searchContoller.text =
+                                                            '';
+                                                        setState(() {});
                                                         listen();
+                                                      },
+                                                      onPointerUp: (_) {
                                                         setState(() {
                                                           searchContoller.text =
                                                               voiceText;
+                                                          print(
+                                                              '${voiceText}eeeee');
                                                         });
-                                                      },
-                                                      onTapUp: (_) {
-                                                        print(voiceText);
+                                                        stop();
                                                       },
                                                       child:
                                                           FloatingActionButton(
@@ -185,14 +189,15 @@ class _SerachScreenState extends State<SerachScreen> {
                                                         mini: true,
                                                         backgroundColor:
                                                             Colors.transparent,
-                                                        child: Icon(Icons.mic),
+                                                        child: const Icon(
+                                                            Icons.mic),
                                                       ),
                                                     ),
                                                     const SizedBox(
                                                       width: 5.0,
                                                     ),
-                                                    MoviesCubit.get(context)
-                                                            .searchValue
+                                                    searchContoller
+                                                            .text.isNotEmpty
                                                         ? IconButton(
                                                             icon: const Icon(
                                                               Icons.cancel,
@@ -575,7 +580,10 @@ class _SerachScreenState extends State<SerachScreen> {
                                                         const SizedBox(
                                                           height: 20.0,
                                                         ),
-                                                itemCount: 10),
+                                                itemCount:
+                                                    MoviesCubit.get(context)
+                                                        .movieSearch
+                                                        .length),
                                           ],
                                         ),
                                       ),
@@ -815,6 +823,11 @@ class _SerachScreenState extends State<SerachScreen> {
         });
   }
 
+  void stop() async {
+    setState(() => isListening = false);
+    speechToText!.stop();
+  }
+
   void listen() async {
     if (!isListening) {
       bool available = await speechToText!.initialize(
@@ -832,9 +845,6 @@ class _SerachScreenState extends State<SerachScreen> {
           }),
         );
       }
-    } else {
-      setState(() => isListening = false);
-      speechToText!.stop();
     }
   }
 }

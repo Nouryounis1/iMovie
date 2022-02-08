@@ -117,7 +117,7 @@ Widget creditMovieItem(String title, String path) => SizedBox(
           Padding(
             padding: const EdgeInsets.only(left: 15.0),
             child: title == ''
-                ? Text('Name')
+                ? const Text('Name')
                 : Text(
                     title,
                     style: const TextStyle(
@@ -161,7 +161,7 @@ Widget defaultFormField(
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: HexColor(primaryColor))),
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white),
+        labelStyle: const TextStyle(color: Colors.white),
         prefixIcon: Icon(
           prefix,
           color: Colors.white,

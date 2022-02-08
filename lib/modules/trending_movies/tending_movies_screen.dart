@@ -33,7 +33,7 @@ class TrendingMoviesScreen extends StatelessWidget {
           ),
           backgroundColor: HexColor('15141F'),
           body: GridView.count(
-            childAspectRatio: 1.45 / 2,
+            childAspectRatio: 1.45 / 2.2,
             crossAxisCount: 2,
             children: List.generate(cubit.popularMovies.length, (index) {
               return InkWell(
