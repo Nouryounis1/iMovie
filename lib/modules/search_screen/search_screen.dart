@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -26,6 +27,7 @@ class _SerachScreenState extends State<SerachScreen> {
   var searchContoller = TextEditingController();
 
   var searchContoller2 = TextEditingController();
+  bool isListening = false;
 
   @override
   void initState() {
@@ -128,104 +130,136 @@ class _SerachScreenState extends State<SerachScreen> {
                                         child: Padding(
                                           padding:
                                               const EdgeInsets.only(left: 10.0),
-                                          child: TextFormField(
-                                            enableInteractiveSelection: false,
-                                            cursorColor: HexColor(primaryColor),
-                                            style: const TextStyle(
-                                                color: Colors.white),
-                                            onChanged: (String value) {
-                                              MoviesCubit.get(context)
-                                                  .getMovieSearch(value);
-                                              if (value.isNotEmpty) {
-                                                MoviesCubit.get(context)
-                                                    .changeValueOfSearchBarMovie(
-                                                        true);
-                                              } else {
-                                                MoviesCubit.get(context)
-                                                    .changeValueOfSearchBarMovie(
-                                                        false);
-                                                MoviesCubit.get(context)
-                                                    .movieSearch = [];
-                                              }
-                                            },
-                                            controller: searchContoller,
-                                            decoration: InputDecoration(
-                                                contentPadding:
-                                                    const EdgeInsets.only(
-                                                  top: 14,
-                                                ),
-                                                border: InputBorder.none,
-                                                hintText: 'Movie Name',
-                                                hintStyle: TextStyle(
-                                                    color:
-                                                        Colors.grey.shade300),
-                                                suffixIcon: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Listener(
-                                                      onPointerDown: (_) {
-                                                        searchContoller.text =
-                                                            '';
-                                                        setState(() {});
-                                                        listen();
-                                                      },
-                                                      onPointerUp: (_) {
-                                                        setState(() {
-                                                          searchContoller.text =
-                                                              voiceText;
-                                                          print(
-                                                              '${voiceText}eeeee');
-                                                        });
-                                                        stop();
-                                                      },
-                                                      child:
-                                                          FloatingActionButton(
-                                                        elevation: 0.0,
-                                                        onPressed: () {},
-                                                        mini: true,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        child: const Icon(
-                                                            Icons.mic),
-                                                      ),
+                                          child: Stack(
+                                            children: [
+                                              TextFormField(
+                                                enableInteractiveSelection:
+                                                    false,
+                                                cursorColor:
+                                                    HexColor(primaryColor),
+                                                style: const TextStyle(
+                                                    color: Colors.white),
+                                                onChanged: (String value) {
+                                                  MoviesCubit.get(context)
+                                                      .getMovieSearch(value);
+                                                  if (value.isNotEmpty) {
+                                                    MoviesCubit.get(context)
+                                                        .changeValueOfSearchBarMovie(
+                                                            true);
+                                                  } else {
+                                                    MoviesCubit.get(context)
+                                                        .changeValueOfSearchBarMovie(
+                                                            false);
+                                                    MoviesCubit.get(context)
+                                                        .movieSearch = [];
+                                                  }
+                                                },
+                                                controller: searchContoller,
+                                                decoration: InputDecoration(
+                                                    contentPadding:
+                                                        const EdgeInsets.only(
+                                                      top: 14,
                                                     ),
-                                                    const SizedBox(
-                                                      width: 5.0,
-                                                    ),
-                                                    searchContoller
-                                                            .text.isNotEmpty
-                                                        ? IconButton(
-                                                            icon: const Icon(
-                                                              Icons.cancel,
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                            onPressed: () {
+                                                    border: InputBorder.none,
+                                                    hintText: isListening
+                                                        ? ''
+                                                        : 'Movie Name',
+                                                    hintStyle: TextStyle(
+                                                        color: Colors
+                                                            .grey.shade300),
+                                                    suffixIcon: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        GestureDetector(
+                                                          onLongPressDown: (_) {
+                                                            searchContoller
+                                                                .clear();
+
+                                                            listen();
+                                                          },
+                                                          onLongPressUp: () {
+                                                            stop();
+
+                                                            setState(() {
                                                               searchContoller
-                                                                  .clear();
-                                                              MoviesCubit.get(
-                                                                      context)
-                                                                  .changeValueOfSearchBarMovie(
-                                                                      false);
-                                                              MoviesCubit.get(
-                                                                      context)
-                                                                  .movieSearch = [];
-                                                            },
-                                                          )
-                                                        : const SizedBox(
-                                                            height: 0,
-                                                            width: 0,
+                                                                      .text =
+                                                                  voiceText;
+                                                            });
+
+                                                            print(
+                                                                '${voiceText}eeeee');
+                                                          },
+                                                          child:
+                                                              FloatingActionButton(
+                                                            elevation: 0.0,
+                                                            onPressed: () {},
+                                                            mini: true,
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            child: const Icon(
+                                                                Icons.mic),
                                                           ),
-                                                  ],
-                                                ),
-                                                prefixIcon: const Icon(
-                                                  Icons.search,
-                                                  color: Colors.white,
-                                                )),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5.0,
+                                                        ),
+                                                        searchContoller
+                                                                .text.isNotEmpty
+                                                            ? IconButton(
+                                                                icon:
+                                                                    const Icon(
+                                                                  Icons.cancel,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                                onPressed: () {
+                                                                  searchContoller
+                                                                      .clear();
+                                                                  MoviesCubit.get(
+                                                                          context)
+                                                                      .changeValueOfSearchBarMovie(
+                                                                          false);
+                                                                  MoviesCubit.get(
+                                                                          context)
+                                                                      .movieSearch = [];
+                                                                },
+                                                              )
+                                                            : const SizedBox(
+                                                                height: 0,
+                                                                width: 0,
+                                                              ),
+                                                      ],
+                                                    ),
+                                                    prefixIcon: const Icon(
+                                                      Icons.search,
+                                                      color: Colors.white,
+                                                    )),
+                                              ),
+                                              Positioned(
+                                                top: 10,
+                                                left: 50,
+                                                child: isListening
+                                                    ? DefaultTextStyle(
+                                                        style: const TextStyle(
+                                                          fontSize: 20.0,
+                                                        ),
+                                                        child: AnimatedTextKit(
+                                                          animatedTexts: [
+                                                            WavyAnimatedText(
+                                                                '. . .'),
+                                                          ],
+                                                          isRepeatingAnimation:
+                                                              true,
+                                                        ),
+                                                      )
+                                                    : Container(),
+                                              )
+                                            ],
                                           ),
                                         ),
                                         flex: 1,
@@ -780,7 +814,7 @@ class _SerachScreenState extends State<SerachScreen> {
                                                                     color: Colors
                                                                         .greenAccent,
                                                                   ),
-                                                            SizedBox(
+                                                            const SizedBox(
                                                               width: 10.0,
                                                             ),
                                                             Text(
@@ -825,17 +859,20 @@ class _SerachScreenState extends State<SerachScreen> {
 
   void stop() async {
     setState(() => isListening = false);
+
     speechToText!.stop();
   }
 
   void listen() async {
     if (!isListening) {
       bool available = await speechToText!.initialize(
+        debugLogging: true,
         onStatus: (val) => print('onStatus: $val'),
         onError: (val) => print('onError: $val'),
       );
       if (available) {
         setState(() => isListening = true);
+
         speechToText!.listen(
           onResult: (val) => setState(() {
             voiceText = val.recognizedWords;
