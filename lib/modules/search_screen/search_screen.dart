@@ -5,6 +5,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:movies_app/cubit/cubit.dart';
 import 'package:movies_app/cubit/state.dart';
 import 'package:movies_app/shared/components/components.dart';
+import 'package:movies_app/shared/speech_api/speech_api.dart';
 import 'package:movies_app/styles/colors.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -16,10 +17,13 @@ class SerachScreen extends StatefulWidget {
   State<SerachScreen> createState() => _SerachScreenState();
 }
 
-SpeechToText? speechToText;
+SpeechToText speechToText = SpeechToText();
+
 bool isListening = false;
 String voiceText = '';
 double voiceConfidence = 1.0;
+bool _speechEnabled = false;
+late FocusNode myFocusNode;
 
 class _SerachScreenState extends State<SerachScreen> {
   var formKey = GlobalKey<FormState>();
@@ -32,7 +36,22 @@ class _SerachScreenState extends State<SerachScreen> {
   @override
   void initState() {
     super.initState();
-    speechToText = SpeechToText();
+    _initSpeech();
+    myFocusNode = FocusNode();
+  }
+
+  void _initSpeech() async {
+    _speechEnabled = await speechToText.initialize();
+
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    searchContoller.dispose();
+    myFocusNode.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -133,12 +152,40 @@ class _SerachScreenState extends State<SerachScreen> {
                                           child: Stack(
                                             children: [
                                               TextFormField(
-                                                enableInteractiveSelection:
-                                                    false,
+                                                autofocus: true,
+                                                focusNode: myFocusNode,
+                                                textInputAction:
+                                                    TextInputAction.go,
                                                 cursorColor:
                                                     HexColor(primaryColor),
                                                 style: const TextStyle(
                                                     color: Colors.white),
+                                                onFieldSubmitted:
+                                                    (String value) {
+                                                  if (searchContoller
+                                                      .text.isNotEmpty) {
+                                                    searchContoller.selection =
+                                                        TextSelection.fromPosition(
+                                                            TextPosition(
+                                                                offset:
+                                                                    searchContoller
+                                                                        .text
+                                                                        .length));
+                                                  }
+                                                  MoviesCubit.get(context)
+                                                      .getMovieSearch(value);
+                                                  if (value.isNotEmpty) {
+                                                    MoviesCubit.get(context)
+                                                        .changeValueOfSearchBarMovie(
+                                                            true);
+                                                  } else {
+                                                    MoviesCubit.get(context)
+                                                        .changeValueOfSearchBarMovie(
+                                                            false);
+                                                    MoviesCubit.get(context)
+                                                        .movieSearch = [];
+                                                  }
+                                                },
                                                 onChanged: (String value) {
                                                   MoviesCubit.get(context)
                                                       .getMovieSearch(value);
@@ -177,22 +224,20 @@ class _SerachScreenState extends State<SerachScreen> {
                                                         GestureDetector(
                                                           onLongPressDown: (_) {
                                                             searchContoller
-                                                                .clear();
+                                                                .text = '';
+                                                            toggleRecording();
 
-                                                            listen();
+                                                            if (searchContoller
+                                                                .text
+                                                                .isNotEmpty) {
+                                                              TextSelection.fromPosition(
+                                                                  TextPosition(
+                                                                      offset: searchContoller
+                                                                          .text
+                                                                          .length));
+                                                            }
                                                           },
-                                                          onLongPressUp: () {
-                                                            stop();
-
-                                                            setState(() {
-                                                              searchContoller
-                                                                      .text =
-                                                                  voiceText;
-                                                            });
-
-                                                            print(
-                                                                '${voiceText}eeeee');
-                                                          },
+                                                          onLongPressUp: () {},
                                                           child:
                                                               FloatingActionButton(
                                                             elevation: 0.0,
@@ -270,62 +315,90 @@ class _SerachScreenState extends State<SerachScreen> {
                                 const SizedBox(
                                   height: 20.0,
                                 ),
-                                MoviesCubit.get(context).movieSearch.isEmpty
-                                    ? Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 20.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              'Recommendations  ',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 20.0,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              height: 20.0,
-                                            ),
-                                            ListView.separated(
-                                                scrollDirection: Axis.vertical,
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const BouncingScrollPhysics(),
-                                                itemBuilder: (context, index) {
-                                                  return Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      SizedBox(
-                                                        height: 180,
-                                                        child: Row(
+                                if (MoviesCubit.get(context)
+                                    .movieSearch
+                                    .isEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Recommendations  ',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 20.0,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 20.0,
+                                        ),
+                                        ListView.separated(
+                                            scrollDirection: Axis.vertical,
+                                            shrinkWrap: true,
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            itemBuilder: (context, index) {
+                                              return Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                    height: 180,
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          child: Image.network(
+                                                            'https://image.tmdb.org/t/p/w500/'
+                                                            '${MoviesCubit.get(context).nowPlayingMovies[index]['poster_path']}',
+                                                            width: 130,
+                                                            height: 180,
+                                                            fit: BoxFit.fill,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                            width: 15),
+                                                        Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            ClipRRect(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              child:
-                                                                  Image.network(
-                                                                'https://image.tmdb.org/t/p/w500/'
-                                                                '${MoviesCubit.get(context).nowPlayingMovies[index]['poster_path']}',
-                                                                width: 130,
-                                                                height: 180,
-                                                                fit:
-                                                                    BoxFit.fill,
+                                                            SizedBox(
+                                                              width: 150.0,
+                                                              child: Text(
+                                                                MoviesCubit.get(
+                                                                            context)
+                                                                        .nowPlayingMovies[index]
+                                                                    [
+                                                                    'original_title'],
+                                                                style:
+                                                                    const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 20,
+                                                                ),
                                                               ),
                                                             ),
                                                             const SizedBox(
-                                                                width: 15),
-                                                            Column(
+                                                              height: 5.0,
+                                                            ),
+                                                            Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
                                                                       .start,
@@ -333,176 +406,182 @@ class _SerachScreenState extends State<SerachScreen> {
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                SizedBox(
-                                                                  width: 150.0,
-                                                                  child: Text(
-                                                                    MoviesCubit.get(context)
-                                                                            .nowPlayingMovies[index]
-                                                                        [
-                                                                        'original_title'],
-                                                                    style:
-                                                                        const TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                      fontSize:
-                                                                          20,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                  height: 5.0,
-                                                                ),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Container(
-                                                                      margin: const EdgeInsets
-                                                                              .only(
-                                                                          top:
-                                                                              5.0),
-                                                                      child:
-                                                                          Row(
-                                                                        children: [
-                                                                          Icon(
-                                                                            Icons.star,
-                                                                            color:
-                                                                                HexColor(primaryColor),
-                                                                            size:
-                                                                                15,
-                                                                          ),
-                                                                          const SizedBox(
-                                                                            width:
-                                                                                3.0,
-                                                                          ),
-                                                                          Text(
-                                                                            '${MoviesCubit.get(context).nowPlayingMovies[index]['vote_average'].toString()} (IMDB)',
-                                                                            style: const TextStyle(
-                                                                                color: Colors.white,
-                                                                                fontSize: 12.0,
-                                                                                letterSpacing: 2),
-                                                                          ),
-                                                                          const SizedBox(
-                                                                            width:
-                                                                                5.0,
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                const SizedBox(
-                                                                  height: 5.0,
-                                                                ),
                                                                 Container(
-                                                                  padding: const EdgeInsets
+                                                                  margin: const EdgeInsets
                                                                           .only(
-                                                                      left:
-                                                                          5.0),
-                                                                  width: 150.0,
-                                                                  child: Wrap(
+                                                                      top: 5.0),
+                                                                  child: Row(
                                                                     children: [
-                                                                      for (var k
-                                                                          in MoviesCubit.get(context).nowPlayingMovies[index]
-                                                                              [
-                                                                              'genre_ids'])
-                                                                        Text(
-                                                                          '${MoviesCubit.get(context).map1[k]}   ',
-                                                                          style: TextStyle(
-                                                                              color: Colors.grey.shade500,
-                                                                              fontWeight: FontWeight.w500,
-                                                                              fontSize: 12.0,
-                                                                              height: 2),
-                                                                        ),
+                                                                      Icon(
+                                                                        Icons
+                                                                            .star,
+                                                                        color: HexColor(
+                                                                            primaryColor),
+                                                                        size:
+                                                                            15,
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            3.0,
+                                                                      ),
+                                                                      Text(
+                                                                        '${MoviesCubit.get(context).nowPlayingMovies[index]['vote_average'].toString()} (IMDB)',
+                                                                        style: const TextStyle(
+                                                                            color: Colors
+                                                                                .white,
+                                                                            fontSize:
+                                                                                12.0,
+                                                                            letterSpacing:
+                                                                                2),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            5.0,
+                                                                      ),
                                                                     ],
                                                                   ),
                                                                 ),
                                                               ],
                                                             ),
+                                                            const SizedBox(
+                                                              height: 5.0,
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left:
+                                                                          5.0),
+                                                              width: 150.0,
+                                                              child: Wrap(
+                                                                children: [
+                                                                  for (var k in MoviesCubit.get(
+                                                                              context)
+                                                                          .nowPlayingMovies[index]
+                                                                      [
+                                                                      'genre_ids'])
+                                                                    Text(
+                                                                      '${MoviesCubit.get(context).map1[k]}   ',
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .grey
+                                                                              .shade500,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontSize:
+                                                                              12.0,
+                                                                          height:
+                                                                              2),
+                                                                    ),
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
-                                                      )
-                                                    ],
-                                                  );
-                                                },
-                                                separatorBuilder:
-                                                    (context, index) =>
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              );
+                                            },
+                                            separatorBuilder:
+                                                (context, index) =>
+                                                    const SizedBox(
+                                                      height: 20.0,
+                                                    ),
+                                            itemCount: 10),
+                                      ],
+                                    ),
+                                  ),
+                                if (state is SearchSuccessState)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ListView.separated(
+                                            scrollDirection: Axis.vertical,
+                                            shrinkWrap: true,
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            itemBuilder: (context, index) {
+                                              return Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                    height: 180,
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            child: MoviesCubit.get(context)
+                                                                            .movieSearch[index]
+                                                                        [
+                                                                        'poster_path'] ==
+                                                                    null
+                                                                ? const FadeInImage(
+                                                                    width: 130,
+                                                                    height: 180,
+                                                                    fit: BoxFit
+                                                                        .fill,
+                                                                    placeholder:
+                                                                        AssetImage(
+                                                                            'assets/placeholder.jpg'),
+                                                                    image: AssetImage(
+                                                                        'assets/placeholder.jpg'))
+                                                                : FadeInImage(
+                                                                    width: 130,
+                                                                    height: 180,
+                                                                    fit: BoxFit
+                                                                        .fill,
+                                                                    placeholder:
+                                                                        const AssetImage(
+                                                                            'assets/placeholder.jpg'),
+                                                                    image: NetworkImage(
+                                                                        'https://image.tmdb.org/t/p/w500/${MoviesCubit.get(context).movieSearch[index]['poster_path']}'))),
                                                         const SizedBox(
-                                                          height: 20.0,
-                                                        ),
-                                                itemCount: 10),
-                                          ],
-                                        ),
-                                      )
-                                    : Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 20.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            ListView.separated(
-                                                scrollDirection: Axis.vertical,
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const BouncingScrollPhysics(),
-                                                itemBuilder: (context, index) {
-                                                  return Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      SizedBox(
-                                                        height: 180,
-                                                        child: Row(
+                                                            width: 15),
+                                                        Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            ClipRRect(
-                                                                borderRadius: BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                                child: MoviesCubit.get(context)
-                                                                                .movieSearch[index]
-                                                                            [
-                                                                            'poster_path'] ==
-                                                                        null
-                                                                    ? const FadeInImage(
-                                                                        width:
-                                                                            130,
-                                                                        height:
-                                                                            180,
-                                                                        fit: BoxFit
-                                                                            .fill,
-                                                                        placeholder:
-                                                                            AssetImage(
-                                                                                'assets/placeholder.jpg'),
-                                                                        image: AssetImage(
-                                                                            'assets/placeholder.jpg'))
-                                                                    : FadeInImage(
-                                                                        width:
-                                                                            130,
-                                                                        height:
-                                                                            180,
-                                                                        fit: BoxFit
-                                                                            .fill,
-                                                                        placeholder:
-                                                                            const AssetImage(
-                                                                                'assets/placeholder.jpg'),
-                                                                        image: NetworkImage(
-                                                                            'https://image.tmdb.org/t/p/w500/${MoviesCubit.get(context).movieSearch[index]['poster_path']}'))),
+                                                            SizedBox(
+                                                              width: 150.0,
+                                                              child: Text(
+                                                                MoviesCubit.get(
+                                                                            context)
+                                                                        .movieSearch[index]
+                                                                    [
+                                                                    'original_title'],
+                                                                style:
+                                                                    const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 20,
+                                                                ),
+                                                              ),
+                                                            ),
                                                             const SizedBox(
-                                                                width: 15),
-                                                            Column(
+                                                              height: 5.0,
+                                                            ),
+                                                            Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
                                                                       .start,
@@ -510,117 +589,95 @@ class _SerachScreenState extends State<SerachScreen> {
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                SizedBox(
-                                                                  width: 150.0,
-                                                                  child: Text(
-                                                                    MoviesCubit.get(context)
-                                                                            .movieSearch[index]
-                                                                        [
-                                                                        'original_title'],
-                                                                    style:
-                                                                        const TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                      fontSize:
-                                                                          20,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                  height: 5.0,
-                                                                ),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Container(
-                                                                      margin: const EdgeInsets
-                                                                              .only(
-                                                                          top:
-                                                                              5.0),
-                                                                      child:
-                                                                          Row(
-                                                                        children: [
-                                                                          Icon(
-                                                                            Icons.star,
-                                                                            color:
-                                                                                HexColor(primaryColor),
-                                                                            size:
-                                                                                15,
-                                                                          ),
-                                                                          const SizedBox(
-                                                                            width:
-                                                                                3.0,
-                                                                          ),
-                                                                          Text(
-                                                                            '${MoviesCubit.get(context).movieSearch[index]['vote_average'].toString()} (IMDB)',
-                                                                            style: const TextStyle(
-                                                                                color: Colors.white,
-                                                                                fontSize: 12.0,
-                                                                                letterSpacing: 2),
-                                                                          ),
-                                                                          const SizedBox(
-                                                                            width:
-                                                                                5.0,
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                const SizedBox(
-                                                                  height: 5.0,
-                                                                ),
                                                                 Container(
-                                                                  padding: const EdgeInsets
+                                                                  margin: const EdgeInsets
                                                                           .only(
-                                                                      left:
-                                                                          5.0),
-                                                                  width: 150.0,
-                                                                  child: Wrap(
+                                                                      top: 5.0),
+                                                                  child: Row(
                                                                     children: [
-                                                                      for (var k
-                                                                          in MoviesCubit.get(context).movieSearch[index]
-                                                                              [
-                                                                              'genre_ids'])
-                                                                        Text(
-                                                                          '${MoviesCubit.get(context).map1[k]}   ',
-                                                                          style: TextStyle(
-                                                                              color: Colors.grey.shade500,
-                                                                              fontWeight: FontWeight.w500,
-                                                                              fontSize: 12.0,
-                                                                              height: 2),
-                                                                        ),
+                                                                      Icon(
+                                                                        Icons
+                                                                            .star,
+                                                                        color: HexColor(
+                                                                            primaryColor),
+                                                                        size:
+                                                                            15,
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            3.0,
+                                                                      ),
+                                                                      Text(
+                                                                        '${MoviesCubit.get(context).movieSearch[index]['vote_average'].toString()} (IMDB)',
+                                                                        style: const TextStyle(
+                                                                            color: Colors
+                                                                                .white,
+                                                                            fontSize:
+                                                                                12.0,
+                                                                            letterSpacing:
+                                                                                2),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            5.0,
+                                                                      ),
                                                                     ],
                                                                   ),
                                                                 ),
                                                               ],
                                                             ),
+                                                            const SizedBox(
+                                                              height: 5.0,
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left:
+                                                                          5.0),
+                                                              width: 150.0,
+                                                              child: Wrap(
+                                                                children: [
+                                                                  for (var k in MoviesCubit.get(
+                                                                              context)
+                                                                          .movieSearch[index]
+                                                                      [
+                                                                      'genre_ids'])
+                                                                    Text(
+                                                                      '${MoviesCubit.get(context).map1[k]}   ',
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .grey
+                                                                              .shade500,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontSize:
+                                                                              12.0,
+                                                                          height:
+                                                                              2),
+                                                                    ),
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
-                                                      )
-                                                    ],
-                                                  );
-                                                },
-                                                separatorBuilder:
-                                                    (context, index) =>
-                                                        const SizedBox(
-                                                          height: 20.0,
-                                                        ),
-                                                itemCount:
-                                                    MoviesCubit.get(context)
-                                                        .movieSearch
-                                                        .length),
-                                          ],
-                                        ),
-                                      ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              );
+                                            },
+                                            separatorBuilder:
+                                                (context, index) =>
+                                                    const SizedBox(
+                                                      height: 20.0,
+                                                    ),
+                                            itemCount: MoviesCubit.get(context)
+                                                .movieSearch
+                                                .length),
+                                      ],
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
@@ -857,31 +914,10 @@ class _SerachScreenState extends State<SerachScreen> {
         });
   }
 
-  void stop() async {
-    setState(() => isListening = false);
-
-    speechToText!.stop();
-  }
-
-  void listen() async {
-    if (!isListening) {
-      bool available = await speechToText!.initialize(
-        debugLogging: true,
-        onStatus: (val) => print('onStatus: $val'),
-        onError: (val) => print('onError: $val'),
+  Future toggleRecording() => SpeechApi.toggleRecording(
+        onResult: (text) => setState(() => searchContoller.text = text),
+        onListening: (isListening) {
+          setState(() => this.isListening = isListening);
+        },
       );
-      if (available) {
-        setState(() => isListening = true);
-
-        speechToText!.listen(
-          onResult: (val) => setState(() {
-            voiceText = val.recognizedWords;
-            if (val.hasConfidenceRating && val.confidence > 0) {
-              voiceConfidence = val.confidence;
-            }
-          }),
-        );
-      }
-    }
-  }
 }

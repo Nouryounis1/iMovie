@@ -19,3 +19,9 @@ class MoviesErorPopularMoviesDataState extends MoviesStates {}
 class MoviesCheckVideoUrlState extends MoviesStates {}
 
 class SearchMicState extends MoviesStates {}
+
+class SearchLoadingState extends MoviesStates {}
+
+class SearchSuccessState extends MoviesStates {}
+
+class SearchErrorState extends MoviesStates {}

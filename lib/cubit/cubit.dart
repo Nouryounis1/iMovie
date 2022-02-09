@@ -308,13 +308,18 @@ class MoviesCubit extends Cubit<MoviesStates> {
   Future<MovieSearch?> getMovieSearch(String query) async {
     MovieSearch? movieSearchs;
 
+    emit(SearchLoadingState());
+
     try {
       Response userData = await _dio.get(Endpoints.movieSearchUrl(query));
 
       movieSearch = userData.data['results'];
+      emit(SearchSuccessState());
     } on DioError catch (e) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx and is also not 304.
+      emit(SearchErrorState());
+
       if (e.response != null) {
         print('Dio error!');
         print('STATUS: ${e.response?.statusCode}');
