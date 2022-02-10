@@ -8,6 +8,8 @@ class MoviesChangeCarsouelIndexState extends MoviesStates {}
 
 class SearchBarMovieState extends MoviesStates {}
 
+class ChangeSearhingValueMovie extends MoviesStates {}
+
 class SearchBarPersonState extends MoviesStates {}
 
 class MoviesLoadingPopularMoviesDataState extends MoviesStates {}
@@ -25,3 +27,9 @@ class SearchLoadingState extends MoviesStates {}
 class SearchSuccessState extends MoviesStates {}
 
 class SearchErrorState extends MoviesStates {}
+
+class SearchPersonLoadingState extends MoviesStates {}
+
+class SearchPersonSuccessState extends MoviesStates {}
+
+class SearchPersonErrorState extends MoviesStates {}

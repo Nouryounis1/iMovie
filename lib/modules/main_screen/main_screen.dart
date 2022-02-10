@@ -217,7 +217,7 @@ class MainScreen extends StatelessWidget {
   }
 }
 
-Widget popularMoviesItem(String title, String path, double rating) => SizedBox(
+Widget popularMoviesItem(String title, String path, dynamic rating) => SizedBox(
       height: 306,
       width: 200,
       child: Column(

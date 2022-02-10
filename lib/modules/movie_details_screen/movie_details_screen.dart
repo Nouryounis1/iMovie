@@ -19,7 +19,7 @@ class MovieDetailsScreen extends StatefulWidget {
   final String moiveTitle;
   final int movieId;
   final dynamic data;
-  final double voteStar;
+  final dynamic voteStar;
   final String relaseDate;
   final String overview;
   final List<dynamic> genres;

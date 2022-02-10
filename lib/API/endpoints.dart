@@ -81,7 +81,7 @@ class Endpoints {
   }
 
   static String personSearchUrl(String query) {
-    return "$API_BASE_URL/search/person?query=$query&api_key=$API_KEY";
+    return "$API_BASE_URL/search/person?&api_key=$API_KEY&language=en-US&query=$query&page=1&include_adult=false";
   }
 
   static getPerson(int personId) {

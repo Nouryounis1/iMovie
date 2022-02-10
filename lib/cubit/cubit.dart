@@ -12,6 +12,7 @@ import 'package:movies_app/models/movie_credit_model.dart';
 import 'package:movies_app/models/movies_model.dart';
 import 'package:movies_app/models/movies_video_model.dart';
 import 'package:movies_app/models/nowplaying_movies_model.dart';
+import 'package:movies_app/models/person_search_model.dart';
 import 'package:movies_app/models/popular_person_model.dart';
 import 'package:movies_app/models/search_movie_model.dart';
 import 'package:movies_app/modules/discover_screen/discover_screen.dart';
@@ -36,6 +37,7 @@ class MoviesCubit extends Cubit<MoviesStates> {
   List<dynamic> nowPlayingMovies = [];
   List<dynamic> allMoviesGenress = [];
   List<dynamic> movieSearch = [];
+  List<dynamic> personSearch = [];
   List<dynamic> popularPersons = [];
   Map<int, String> map1 = {};
   bool isLoading = true;
@@ -47,6 +49,7 @@ class MoviesCubit extends Cubit<MoviesStates> {
 
   bool searchValue = false;
   bool searchValue2 = false;
+  bool isSearchingMovie = false;
 
   String img_path = '';
 
@@ -55,6 +58,11 @@ class MoviesCubit extends Cubit<MoviesStates> {
     const DiscoverScreen(),
     SerachScreen()
   ];
+
+  void changeValueOfIsSearchingMovie(bool value) {
+    isSearchingMovie = value;
+    emit(ChangeSearhingValueMovie());
+  }
 
   void changeValueOfSearchBarMovie(bool value) {
     searchValue = value;
@@ -305,16 +313,19 @@ class MoviesCubit extends Cubit<MoviesStates> {
     return allMoviesGenres;
   }
 
+  bool isSearcMoviehLoading = false;
   Future<MovieSearch?> getMovieSearch(String query) async {
     MovieSearch? movieSearchs;
 
-    emit(SearchLoadingState());
-
     try {
+      isSearcMoviehLoading = true;
+      emit(SearchLoadingState());
+
       Response userData = await _dio.get(Endpoints.movieSearchUrl(query));
 
       movieSearch = userData.data['results'];
       emit(SearchSuccessState());
+      isSearcMoviehLoading = false;
     } on DioError catch (e) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx and is also not 304.
@@ -358,5 +369,38 @@ class MoviesCubit extends Cubit<MoviesStates> {
     }
 
     return populaPerson;
+  }
+
+  bool isSearcPersonLoading = false;
+  Future<PersonSearch?> getPersonSearch(String query) async {
+    PersonSearch? personSearchs;
+
+    try {
+      isSearcPersonLoading = true;
+      emit(SearchPersonLoadingState());
+
+      Response userData = await _dio.get(Endpoints.personSearchUrl(query));
+
+      personSearch = userData.data['results'];
+      emit(SearchPersonSuccessState());
+      isSearcPersonLoading = false;
+    } on DioError catch (e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      emit(SearchPersonErrorState());
+
+      if (e.response != null) {
+        print('Dio error!');
+        print('STATUS: ${e.response?.statusCode}');
+        print('DATA: ${e.response?.data}');
+        print('HEADERS: ${e.response?.headers}');
+      } else {
+        // Error due to setting up or sending the request
+        print('Error sending request!');
+        print(e.message);
+      }
+    }
+
+    return personSearchs;
   }
 }

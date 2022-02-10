@@ -24,4 +24,25 @@ class SpeechApi {
 
     return isAvailable;
   }
+
+  static Future<bool> toggleRecording2({
+    required Function(String text) onResult,
+    required ValueChanged<bool> onListening,
+  }) async {
+    if (_speech.isListening) {
+      _speech.stop();
+      return true;
+    }
+
+    final isAvailable = await _speech.initialize(
+      onStatus: (status) => onListening(_speech.isListening),
+      onError: (e) => print('Error: $e'),
+    );
+
+    if (isAvailable) {
+      _speech.listen(onResult: (value) => onResult(value.recognizedWords));
+    }
+
+    return isAvailable;
+  }
 }
